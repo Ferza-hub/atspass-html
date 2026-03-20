@@ -568,6 +568,28 @@
     box.classList.add('show')
   }
 
+  function smartTrim(text, maxLength) {
+  if (!text) return ''
+  text = text.replace(/\s+/g, ' ').trim()
+
+  if (text.length <= maxLength) return text
+
+  const trimmed = text.slice(0, maxLength)
+  const lastSpace = trimmed.lastIndexOf(' ')
+  return trimmed.slice(0, lastSpace) + '...'
+}
+
+function cleanResumeText(text) {
+  if (!text) return ''
+
+  // 🔥 filter binary garbage (PK, dll)
+  if (text.includes('PK') && text.includes('xml')) {
+    return '⚠️ We could not properly read this file. Please upload PDF or TXT for best results.'
+  }
+
+  return text
+}
+
   // ── Render results ──
   function renderResults(data) {
     const improvement = data.after.score - data.before.score
@@ -599,9 +621,14 @@
     }
 
     // Preview text
-    document.getElementById('orig-text').textContent = (data.originalResume || '').slice(0, 400)
-    document.getElementById('opt-text').textContent  = (data.rewrittenResume || '').slice(0, 300)
+    const original = cleanResumeText(data.originalResume)
+const optimized = cleanResumeText(data.rewrittenResume)
 
+document.getElementById('orig-text').textContent =
+  smartTrim(original, 600)
+
+document.getElementById('opt-text').textContent =
+  smartTrim(optimized, 500)
     // PayPal link
     document.getElementById('paypal-btn').href = PAYPAL_LINK
   }
