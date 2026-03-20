@@ -1,4 +1,4 @@
-const { formidable } = require('formidable')
+const formidable = require('formidable')
 const fs = require('fs')
 const client = require('../lib/openai')
 const { calculateATSScore } = require('../lib/ats')
@@ -26,9 +26,9 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const form = formidable({
-      maxFileSize: 5 * 1024 * 1024
-    })
+    const form = new formidable.IncomingForm({
+  maxFileSize: 5 * 1024 * 1024
+})
 
     // 🔥 FIX: parse pakai callback biar stabil di serverless
     const { fields, files } = await new Promise((resolve, reject) => {
