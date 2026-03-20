@@ -144,11 +144,3 @@ async function sendEmail(req, res) {
     res.status(500).json({ error: 'Failed to send email.' })
   }
 }
-
-// ── DEFAULT EXPORT — Vercel entry point ──
-module.exports = async (req, res) => {
-  const url = req.url.split('?')[0]
-  if (url === '/api/analyze')    return analyze(req, res)
-  if (url === '/api/send-email') return sendEmail(req, res)
-  res.status(404).json({ error: 'Not found' })
-}
