@@ -60,8 +60,20 @@ module.exports = async function handler(req, res) {
     ) {
       const pdfParse = require('pdf-parse')
       const buffer = fs.readFileSync(file.filepath)
+      try {
+      const pdfParse = require('pdf-parse')
+      const buffer = fs.readFileSync(file.filepath)
       const parsed = await pdfParse(buffer)
+
       resumeText = parsed.text
+
+} catch (err) {
+  console.error('PDF PARSE ERROR:', err.message)
+
+  return res.status(400).json({
+    error: 'We could not read this PDF. Please upload DOCX or TXT for best results.'
+  })
+}
     } else {
       resumeText = fs.readFileSync(file.filepath, 'utf8')
     }
