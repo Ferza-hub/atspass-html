@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATSPass — Optimize your resume for any job</title>
+  <meta name="description" content="Upload your resume, paste a job description, see your ATS score and get an AI-optimized resume. $5 for 10 applications." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #16a34a;
+      --green-light: #dcfce7;
+      --green-mid: #4ade80;
+      --red: #dc2626;
+      --red-light: #fee2e2;
+      --amber: #d97706;
+      --amber-light: #fef3c7;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--gray-900);
+      background: #fff;
+      line-height: 1.6;
+    }
+
+    /* NAV */
+    nav {
+      border-bottom: 1px solid var(--gray-200);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .logo { font-weight: 700; font-size: 18px; letter-spacing: -0.02em; text-decoration: none; color: var(--gray-900); }
+    .nav-pill { font-size: 13px; color: var(--gray-500); background: var(--gray-100); padding: 6px 14px; border-radius: 20px; }
+
+    /* SECTIONS */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* LANDING */
+    #landing { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .hero { text-align: center; padding: 72px 0 48px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--green-light); color: var(--green);
+      font-size: 13px; font-weight: 500; padding: 6px 16px;
+      border-radius: 20px; margin-bottom: 28px;
+      border: 1px solid #bbf7d0;
+    }
+    .hero-badge span { width: 8px; height: 8px; background: var(--green); border-radius: 50%; display: inline-block; }
+    h1 { font-size: clamp(36px, 5vw, 56px); font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 20px; }
+    h1 em { font-style: normal; color: var(--green); }
+    .hero p { font-size: 18px; color: var(--gray-500); max-width: 560px; margin: 0 auto 36px; }
+    .btn-primary {
+      display: inline-block; background: var(--gray-900); color: #fff;
+      font-size: 16px; font-weight: 500; padding: 14px 32px;
+      border-radius: var(--radius); text-decoration: none;
+      border: none; cursor: pointer; transition: background .15s;
+    }
+    .btn-primary:hover { background: #374151; }
+    .hero-note { font-size: 13px; color: var(--gray-400); margin-top: 12px; }
+
+    /* MOCKUP */
+    .mockup { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 16px; padding: 16px; margin: 0 0 64px; }
+    .mock-panel { background: #fff; border-radius: 10px; border: 1px solid var(--gray-200); padding: 16px; }
+    .mock-panel.good { border-color: #86efac; }
+    .mock-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .mock-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--gray-400); }
+    .mock-panel.good .mock-label { color: var(--green); }
+    .score-badge { font-size: 12px; font-weight: 700; }
+    .score-badge.bad { color: var(--red); }
+    .score-badge.good { color: var(--green); }
+    .mock-lines div { height: 10px; background: var(--gray-100); border-radius: 4px; margin-bottom: 8px; }
+    .mock-panel.good .mock-lines div { background: #dcfce7; }
+    .mock-note { font-size: 11px; font-weight: 600; margin-top: 10px; }
+    .mock-note.bad { color: var(--red); }
+    .mock-note.good { color: var(--green); }
+
+    /* HOW */
+    .how { background: var(--gray-50); border-top: 1px solid var(--gray-200); border-bottom: 1px solid var(--gray-200); padding: 64px 24px; }
+    .how-inner { max-width: 900px; margin: 0 auto; }
+    .how h2 { text-align: center; font-size: 32px; font-weight: 700; margin-bottom: 48px; letter-spacing: -0.02em; }
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+    .step-num { font-size: 11px; font-family: monospace; color: var(--gray-400); margin-bottom: 8px; }
+    .step-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .step-desc { font-size: 13px; color: var(--gray-500); line-height: 1.6; }
+
+    /* PRICING */
+    .pricing { max-width: 900px; margin: 0 auto; padding: 64px 24px; text-align: center; }
+    .pricing h2 { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .pricing > p { color: var(--gray-500); margin-bottom: 40px; }
+    .tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 40px; }
+    .tier { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 24px; text-align: left; }
+    .tier.featured { background: var(--gray-900); border-color: var(--gray-900); color: #fff; }
+    .tier-pop { font-size: 11px; font-weight: 600; color: var(--green-mid); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+    .tier-name { font-size: 14px; color: var(--gray-500); margin-bottom: 4px; }
+    .tier.featured .tier-name { color: #9ca3af; }
+    .tier-price { font-size: 40px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 2px; }
+    .tier-cycle { font-size: 13px; color: var(--gray-400); margin-bottom: 16px; }
+    .tier-apps { font-size: 14px; font-weight: 600; }
+    .tier.featured .tier-apps { color: #fff; }
+    .tier-apps-note { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--gray-200); text-align: center; padding: 24px; font-size: 13px; color: var(--gray-400); }
+
+    /* ── TOOL PAGE ── */
+    #tool { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+
+    .tool-header { text-align: center; margin-bottom: 40px; }
+    .tool-header h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .tool-header p { color: var(--gray-500); }
+
+    .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--gray-700); margin-bottom: 8px; }
+
+    .dropzone {
+      border: 2px dashed var(--gray-200); border-radius: var(--radius);
+      padding: 40px 20px; text-align: center; cursor: pointer;
+      transition: border-color .15s, background .15s;
+      min-height: 180px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 8px;
+    }
+    .dropzone:hover, .dropzone.drag { border-color: var(--green); background: var(--green-light); }
+    .dropzone.has-file { border-color: #86efac; background: #f0fdf4; }
+    .dropzone-icon { font-size: 28px; }
+    .dropzone-title { font-size: 14px; font-weight: 600; color: var(--gray-700); }
+    .dropzone-sub { font-size: 12px; color: var(--gray-400); }
+    #file-input { display: none; }
+
+    textarea {
+      width: 100%; height: 180px; border: 1px solid var(--gray-200);
+      border-radius: var(--radius); padding: 14px; font-size: 13px;
+      color: var(--gray-700); resize: none; font-family: inherit;
+      transition: border-color .15s;
+    }
+    textarea:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(22,163,74,.1); }
+    .char-count { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
+
+    .error-box { background: var(--red-light); border: 1px solid #fca5a5; color: var(--red); font-size: 13px; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; display: none; }
+    .error-box.show { display: block; }
+
+    .tool-cta { text-align: center; }
+    .tool-cta .btn-primary { font-size: 16px; padding: 16px 40px; }
+    .cta-note { font-size: 12px; color: var(--gray-400); margin-top: 8px; }
+
+    /* LOADING */
+    #loading { text-align: center; padding: 80px 24px; }
+    .spinner { width: 40px; height: 40px; border: 3px solid var(--gray-200); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 20px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading h2 { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+    #loading p { color: var(--gray-400); font-size: 14px; }
+
+    /* RESULTS */
+    #results { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+    .results-header { text-align: center; margin-bottom: 32px; }
+    .results-header h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+    .results-header p { color: var(--gray-500); font-size: 14px; }
+
+    .score-row { display: flex; align-items: center; justify-content: center; gap: 48px; margin-bottom: 32px; }
+    .score-block { text-align: center; }
+    .score-circle {
+      width: 120px; height: 120px; border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin: 0 auto 8px; border: 8px solid;
+    }
+    .score-circle.bad { border-color: var(--red-light); }
+    .score-circle.bad .score-num { color: var(--red); }
+    .score-circle.good { border-color: var(--green-light); animation: pulse-green 1s ease forwards; }
+    .score-circle.good .score-num { color: var(--green); }
+    .score-circle.mid { border-color: var(--amber-light); }
+    .score-circle.mid .score-num { color: var(--amber); }
+    @keyframes pulse-green { 0%{border-color:var(--green-light)} 50%{border-color:#86efac} 100%{border-color:#4ade80} }
+    .score-num { font-size: 28px; font-weight: 700; line-height: 1; }
+    .score-label-sm { font-size: 11px; color: var(--gray-400); }
+    .score-block-label { font-size: 13px; color: var(--gray-500); }
+    .arrow-big { font-size: 28px; color: var(--gray-300); }
+    .improvement { font-size: 14px; font-weight: 700; color: var(--green); background: var(--green-light); padding: 4px 14px; border-radius: 20px; }
+
+    .keyword-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 800px; margin: 0 auto 28px; }
+    .kw-box { border-radius: 10px; border: 1px solid; padding: 14px 16px; }
+    .kw-box.missing { background: var(--amber-light); border-color: #fcd34d; }
+    .kw-box.added { background: var(--green-light); border-color: #86efac; }
+    .kw-title { font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+    .kw-box.missing .kw-title { color: var(--amber); }
+    .kw-box.added .kw-title { color: var(--green); }
+    .kw-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .kw-tag { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+    .kw-box.missing .kw-tag { background: #fef3c7; color: #92400e; }
+    .kw-box.added .kw-tag { background: #dcfce7; color: #166534; }
+
+    .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+    .preview-panel { border-radius: var(--radius); border: 1px solid var(--gray-200); overflow: hidden; }
+    .preview-panel.optimized { border-color: #86efac; box-shadow: 0 0 0 1px #dcfce7; }
+    .preview-head { padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); }
+    .preview-panel.optimized .preview-head { background: #f0fdf4; border-color: #86efac; }
+    .preview-head-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--gray-400); }
+    .preview-panel.optimized .preview-head-label { color: var(--green); }
+    .preview-head-score { font-size: 12px; font-weight: 700; }
+    .preview-body { padding: 16px; max-height: 320px; overflow: hidden; position: relative; }
+    .preview-text { font-size: 12px; color: var(--gray-700); white-space: pre-wrap; line-height: 1.7; font-family: inherit; }
+    .preview-blur {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 160px;
+      background: linear-gradient(to top, #fff 40%, transparent);
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 16px;
+    }
+    .preview-blur p { font-size: 13px; font-weight: 600; color: var(--gray-900); margin-bottom: 2px; }
+    .preview-blur span { font-size: 11px; color: var(--gray-400); }
+
+    /* PAYMENT */
+    .pay-box { background: var(--gray-900); color: #fff; border-radius: 16px; padding: 28px; max-width: 480px; margin: 0 auto; text-align: center; }
+    .pay-price { font-size: 36px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 4px; }
+    .pay-sub { color: #9ca3af; font-size: 14px; margin-bottom: 24px; }
+    .btn-paypal {
+      display: block; width: 100%; background: var(--green); color: #fff;
+      font-size: 16px; font-weight: 600; padding: 16px; border-radius: 10px;
+      text-decoration: none; transition: background .15s; margin-bottom: 10px;
+    }
+    .btn-paypal:hover { background: #15803d; }
+    .pay-note { font-size: 12px; color: #6b7280; }
+    .btn-already { background: none; border: 1px solid #374151; color: #9ca3af; font-size: 14px; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; margin-top: 10px; transition: border-color .15s; }
+    .btn-already:hover { border-color: #6b7280; color: #fff; }
+
+    /* EMAIL FORM */
+    #email-section { max-width: 440px; margin: 32px auto 0; text-align: center; display: none; }
+    #email-section h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    #email-section p { color: var(--gray-500); font-size: 14px; margin-bottom: 20px; }
+    .email-input-wrap { display: flex; gap: 8px; }
+    .email-input-wrap input {
+      flex: 1; border: 1px solid var(--gray-200); border-radius: 10px;
+      padding: 12px 16px; font-size: 14px; font-family: inherit;
+    }
+    .email-input-wrap input:focus { outline: none; border-color: var(--green); }
+    .email-input-wrap button {
+      background: var(--gray-900); color: #fff; border: none;
+      padding: 12px 20px; border-radius: 10px; font-size: 14px;
+      font-weight: 600; cursor: pointer; white-space: nowrap;
+    }
+    .email-error { font-size: 12px; color: var(--red); margin-top: 6px; display: none; }
+    .email-error.show { display: block; }
+
+    /* DONE */
+    #done { max-width: 480px; margin: 60px auto; text-align: center; padding: 0 24px; }
+    #done .done-icon { font-size: 56px; margin-bottom: 20px; }
+    #done h2 { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+    #done p { color: var(--gray-500); margin-bottom: 8px; }
+    #done .email-display { font-weight: 700; color: var(--gray-900); font-size: 16px; margin-bottom: 28px; }
+    #done .credits-note { background: var(--green-light); color: var(--green); font-size: 14px; font-weight: 500; padding: 10px 20px; border-radius: 20px; display: inline-block; margin-bottom: 28px; }
+    .btn-secondary { background: none; border: 1px solid var(--gray-200); color: var(--gray-700); font-size: 14px; font-weight: 500; padding: 12px 24px; border-radius: 10px; cursor: pointer; transition: border-color .15s; }
+    .btn-secondary:hover { border-color: var(--gray-400); }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      .input-grid, .preview-grid, .keyword-row, .steps, .tier-grid, .mockup { grid-template-columns: 1fr; }
+      .score-row { gap: 24px; }
+      h1 { font-size: 32px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo" onclick="showSection('landing')">ATSPass</a>
+  <span class="nav-pill">$5 · 10 applications · no subscription</span>
+</nav>
+
+<!-- ══ LANDING ══ -->
+<section id="landing" class="section active">
+  <div id="landing">
+    <div class="hero">
+      <div class="hero-badge"><span></span> $5 for 10 job applications · No subscription ever</div>
+      <h1>Your resume, optimized<br>for <em>every job you apply to</em></h1>
+      <p>Upload your resume. Paste any job description. Get an ATS score and AI-rewritten resume in 30 seconds.</p>
+      <button class="btn-primary" onclick="showSection('tool')">Try free — see your score first</button>
+      <p class="hero-note">See your ATS score and full rewrite before paying anything.</p>
+    </div>
+
+    <div class="mockup">
+      <div class="mock-panel">
+        <div class="mock-header">
+          <span class="mock-label">Your current resume</span>
+          <span class="score-badge bad">41% ATS</span>
+        </div>
+        <div class="mock-lines">
+          <div style="width:75%"></div><div style="width:100%"></div>
+          <div style="width:85%"></div><div style="width:60%"></div>
+          <div style="width:50%;margin-top:12px"></div>
+          <div style="width:100%"></div><div style="width:80%"></div>
+        </div>
+        <div class="mock-note bad">⚠ 6 missing keywords for this role</div>
+      </div>
+      <div class="mock-panel good">
+        <div class="mock-header">
+          <span class="mock-label">Optimized for this job</span>
+          <span class="score-badge good">87% ATS</span>
+        </div>
+        <div class="mock-lines">
+          <div style="width:75%"></div><div style="width:100%"></div>
+          <div style="width:85%"></div><div style="width:60%"></div>
+          <div style="width:50%;margin-top:12px"></div>
+          <div style="width:100%"></div><div style="width:80%"></div>
+        </div>
+        <div class="mock-note good">✓ All key terms matched · ATS-ready format</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="how">
+    <div class="how-inner">
+      <h2>How it works</h2>
+      <div class="steps">
+        <div><div class="step-num">01</div><div class="step-title">Upload your resume</div><div class="step-desc">PDF or Word. We parse it instantly.</div></div>
+        <div><div class="step-num">02</div><div class="step-title">Paste job description</div><div class="step-desc">Copy from LinkedIn, Indeed, anywhere.</div></div>
+        <div><div class="step-num">03</div><div class="step-title">See your ATS score</div><div class="step-desc">Before/after score and full rewrite — free preview.</div></div>
+        <div><div class="step-num">04</div><div class="step-title">Pay $5, get it via email</div><div class="step-desc">10 applications. No subscription ever.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pricing">
+    <h2>Simple pricing</h2>
+    <p>Pay once, no subscription, no surprise charges.</p>
+    <div class="tier-grid">
+      <div class="tier">
+        <div class="tier-name">Starter</div>
+        <div class="tier-price">$5</div>
+        <div class="tier-cycle">one-time</div>
+        <div class="tier-apps">10 applications</div>
+        <div class="tier-apps-note">Perfect to start</div>
+      </div>
+      <div class="tier featured">
+        <div class="tier-pop">Most popular</div>
+        <div class="tier-name">Pro Pack</div>
+        <div class="tier-price">$12</div>
+        <div class="tier-cycle">one-time</div>
+        <div class="tier-apps">30 applications</div>
+        <div class="tier-apps-note">Best value</div>
+      </div>
+      <div class="tier">
+        <div class="tier-name">Hustler</div>
+        <div class="tier-price">$25</div>
+        <div class="tier-cycle">one-time</div>
+        <div class="tier-apps">Unlimited · 1 year</div>
+        <div class="tier-apps-note">Serious job seekers</div>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="showSection('tool')">Try it free — see your score first</button>
+  </div>
+
+  <footer>© 2025 ATSPass · Optimize every application</footer>
+</section>
+
+<!-- ══ TOOL ══ -->
+<section id="tool" class="section">
+  <div class="tool-header">
+    <h1>Optimize your resume</h1>
+    <p>Upload your resume + paste the job description. See your ATS score free.</p>
+  </div>
+
+  <div class="input-grid">
+    <div>
+      <label>Your resume</label>
+      <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
+        <input type="file" id="file-input" accept=".pdf,.doc,.docx,.txt" />
+        <div class="dropzone-icon" id="dz-icon">⬆️</div>
+        <div class="dropzone-title" id="dz-title">Drop your resume here</div>
+        <div class="dropzone-sub" id="dz-sub">PDF, Word, or TXT</div>
+      </div>
+    </div>
+    <div>
+      <label>Job description</label>
+      <textarea id="job-desc" placeholder="Paste the full job description here — copy from LinkedIn, Indeed, or company website..."></textarea>
+      <div class="char-count" id="char-count">0 characters · Minimum 50 needed</div>
+    </div>
+  </div>
+
+  <div class="error-box" id="error-box"></div>
+
+  <div class="tool-cta">
+    <button class="btn-primary" onclick="handleAnalyze()">Analyze my resume →</button>
+    <p class="cta-note">Free to analyze · Pay only to download the optimized version</p>
+  </div>
+</section>
+
+<!-- ══ LOADING ══ -->
+<section id="loading" class="section">
+  <div class="spinner"></div>
+  <h2>Analyzing and optimizing your resume…</h2>
+  <p>This takes about 20–30 seconds</p>
+</section>
+
+<!-- ══ RESULTS ══ -->
+<section id="results" class="section">
+  <div class="results-header">
+    <h2>Your optimization is ready</h2>
+    <p id="improvement-text"></p>
+  </div>
+
+  <div class="score-row">
+    <div class="score-block">
+      <div class="score-circle bad" id="score-before-circle">
+        <div class="score-num" id="score-before-num">—</div>
+        <div class="score-label-sm">ATS score</div>
+      </div>
+      <div class="score-block-label">Original resume</div>
+    </div>
+    <div class="arrow-big">→</div>
+    <div class="score-block">
+      <div class="score-circle good" id="score-after-circle">
+        <div class="score-num" id="score-after-num">—</div>
+        <div class="score-label-sm">ATS score</div>
+      </div>
+      <div class="score-block-label">Optimized version</div>
+    </div>
+  </div>
+
+  <div class="keyword-row">
+    <div class="kw-box missing" id="missing-box" style="display:none">
+      <div class="kw-title">⚠ Keywords that were missing</div>
+      <div class="kw-tags" id="missing-tags"></div>
+    </div>
+    <div class="kw-box added" id="added-box" style="display:none">
+      <div class="kw-title">✓ Keywords added by AI</div>
+      <div class="kw-tags" id="added-tags"></div>
+    </div>
+  </div>
+
+  <div class="preview-grid">
+    <div class="preview-panel">
+      <div class="preview-head">
+        <span class="preview-head-label">Original resume</span>
+        <span class="preview-head-score" id="orig-score-label" style="color:#dc2626"></span>
+      </div>
+      <div class="preview-body">
+        <pre class="preview-text" id="orig-text"></pre>
+      </div>
+    </div>
+    <div class="preview-panel optimized">
+      <div class="preview-head">
+        <span class="preview-head-label">Optimized resume</span>
+        <span class="preview-head-score" id="opt-score-label" style="color:#16a34a"></span>
+      </div>
+      <div class="preview-body">
+        <pre class="preview-text" id="opt-text"></pre>
+        <div class="preview-blur">
+          <p>Full resume ready</p>
+          <span>Pay $5 to unlock · Delivered to your email</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pay-box">
+    <div class="pay-price">$5 · 10 applications</div>
+    <div class="pay-sub">No subscription. Pay once, use for 10 job applications.</div>
+    <a id="paypal-btn" href="#" target="_blank" class="btn-paypal" onclick="showEmailSection()">Pay $5 via PayPal →</a>
+    <p class="pay-note">After payment, enter your email below to receive your resume.</p>
+    <button class="btn-already" onclick="showEmailSection()">I already paid — send my resume</button>
+  </div>
+
+  <div id="email-section">
+    <h3>Enter your email</h3>
+    <p>We'll send your optimized resume immediately after you complete payment.</p>
+    <div class="email-input-wrap">
+      <input type="email" id="email-input" placeholder="you@example.com" />
+      <button onclick="handleSendEmail()">Send →</button>
+    </div>
+    <div class="email-error" id="email-error"></div>
+  </div>
+</section>
+
+<!-- ══ DONE ══ -->
+<section id="done" class="section">
+  <div class="done-icon">✅</div>
+  <h2>Check your inbox!</h2>
+  <p>Your optimized resume has been sent to:</p>
+  <div class="email-display" id="done-email"></div>
+  <div class="credits-note">9 more applications remaining in your pack</div>
+  <br>
+  <button class="btn-secondary" onclick="resetApp()">Optimize another application →</button>
+</section>
+
+<script>
+  // ── CONFIG — change these ──
+  const PAYPAL_LINK = 'https://paypal.me/YOURUSERNAME/5'
+  const API_BASE    = 'https://atspass.ranevaoli.site' // your deployed backend URL
+
+  // ── State ──
+  let uploadedFile = null
+  let analysisResult = null
+
+  // ── Navigation ──
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'))
+    document.getElementById(id).classList.add('active')
+    window.scrollTo(0, 0)
+  }
+
+  // ── File upload ──
+  const dropzone = document.getElementById('dropzone')
+  const fileInput = document.getElementById('file-input')
+
+  fileInput.addEventListener('change', e => setFile(e.target.files[0]))
+  dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag') })
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'))
+  dropzone.addEventListener('drop', e => { e.preventDefault(); dropzone.classList.remove('drag'); setFile(e.dataTransfer.files[0]) })
+
+  function setFile(file) {
+    if (!file) return
+    uploadedFile = file
+    dropzone.classList.add('has-file')
+    document.getElementById('dz-icon').textContent = '📄'
+    document.getElementById('dz-title').textContent = file.name
+    document.getElementById('dz-sub').textContent = (file.size / 1024).toFixed(0) + ' KB · Click to change'
+  }
+
+  // ── Char count ──
+  document.getElementById('job-desc').addEventListener('input', function() {
+    document.getElementById('char-count').textContent = this.value.length + ' characters · Minimum 50 needed'
+  })
+
+  // ── Analyze ──
+  async function handleAnalyze() {
+    const jobDesc = document.getElementById('job-desc').value.trim()
+    const errBox = document.getElementById('error-box')
+
+    if (!uploadedFile) return showError('Please upload your resume.')
+    if (jobDesc.length < 50) return showError('Job description too short. Paste the full job posting.')
+
+    errBox.classList.remove('show')
+    showSection('loading')
+
+    try {
+      const fd = new FormData()
+      fd.append('resume', uploadedFile)
+      fd.append('jobDesc', jobDesc)
+
+      const res = await fetch(API_BASE + '/api/analyze', { method: 'POST', body: fd })
+      const data = await res.json()
+
+      if (!res.ok || data.error) throw new Error(data.error || 'Analysis failed')
+
+      analysisResult = data
+      renderResults(data)
+      showSection('results')
+    } catch (err) {
+      showSection('tool')
+      showError(err.message || 'Something went wrong. Please try again.')
+    }
+  }
+
+  function showError(msg) {
+    const box = document.getElementById('error-box')
+    box.textContent = msg
+    box.classList.add('show')
+  }
+
+  // ── Render results ──
+  function renderResults(data) {
+    const improvement = data.after.score - data.before.score
+
+    document.getElementById('improvement-text').textContent =
+      'Your score improved by +' + improvement + ' points after AI optimization'
+
+    document.getElementById('score-before-num').textContent = data.before.score + '%'
+    document.getElementById('score-after-num').textContent  = data.after.score  + '%'
+    document.getElementById('orig-score-label').textContent = data.before.score + '% ATS'
+    document.getElementById('opt-score-label').textContent  = data.after.score  + '% ATS'
+
+    // Score circle color
+    const afterCircle = document.getElementById('score-after-circle')
+    afterCircle.className = 'score-circle ' + scoreClass(data.after.score)
+
+    // Keywords
+    if (data.before.missingKeywords && data.before.missingKeywords.length) {
+      const box = document.getElementById('missing-box')
+      box.style.display = 'block'
+      document.getElementById('missing-tags').innerHTML =
+        data.before.missingKeywords.slice(0,8).map(k => `<span class="kw-tag">${k}</span>`).join('')
+    }
+    if (data.before.missingKeywords && data.before.missingKeywords.length) {
+      const box = document.getElementById('added-box')
+      box.style.display = 'block'
+      document.getElementById('added-tags').innerHTML =
+        data.before.missingKeywords.slice(0,8).map(k => `<span class="kw-tag">${k}</span>`).join('')
+    }
+
+    // Preview text
+    document.getElementById('orig-text').textContent = (data.originalResume || '').slice(0, 400)
+    document.getElementById('opt-text').textContent  = (data.rewrittenResume || '').slice(0, 300)
+
+    // PayPal link
+    document.getElementById('paypal-btn').href = PAYPAL_LINK
+  }
+
+  function scoreClass(score) {
+    if (score >= 75) return 'good'
+    if (score >= 50) return 'mid'
+    return 'bad'
+  }
+
+  // ── Email section ──
+  function showEmailSection() {
+    document.getElementById('email-section').style.display = 'block'
+    document.getElementById('email-section').scrollIntoView({ behavior: 'smooth' })
+  }
+
+  async function handleSendEmail() {
+    const email = document.getElementById('email-input').value.trim()
+    const errEl = document.getElementById('email-error')
+
+    if (!email.includes('@')) {
+      errEl.textContent = 'Please enter a valid email address.'
+      errEl.classList.add('show')
+      return
+    }
+    errEl.classList.remove('show')
+
+    if (!analysisResult) return
+
+    try {
+      const res = await fetch(API_BASE + '/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, resumeText: analysisResult.rewrittenResume })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+
+      document.getElementById('done-email').textContent = email
+      showSection('done')
+    } catch (err) {
+      errEl.textContent = err.message || 'Failed to send. Please try again.'
+      errEl.classList.add('show')
+    }
+  }
+
+  // ── Reset ──
+  function resetApp() {
+    uploadedFile = null
+    analysisResult = null
+    document.getElementById('job-desc').value = ''
+    document.getElementById('char-count').textContent = '0 characters · Minimum 50 needed'
+    document.getElementById('dz-icon').textContent = '⬆️'
+    document.getElementById('dz-title').textContent = 'Drop your resume here'
+    document.getElementById('dz-sub').textContent = 'PDF, Word, or TXT'
+    dropzone.classList.remove('has-file')
+    document.getElementById('email-section').style.display = 'none'
+    document.getElementById('email-input').value = ''
+    showSection('tool')
+  }
+</script>
+</body>
+</html>
