@@ -1,7 +1,14 @@
-const formidable = require('formidable')
+const { formidable } = require('formidable')
 const fs = require('fs')
 const client = require('../lib/openai')
 const { calculateATSScore } = require('../lib/ats')
+
+// ⛔ WAJIB untuk upload file di Vercel
+export const config = {
+  api: {
+    bodyParser: false
+  }
+}
 
 // CORS
 function setCORS(res) {
@@ -14,30 +21,55 @@ module.exports = async function handler(req, res) {
   setCORS(res)
 
   if (req.method === 'OPTIONS') return res.status(200).end()
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
 
   try {
-    const form = formidable({ maxFileSize: 5 * 1024 * 1024 })
-    const [fields, files] = await form.parse(req)
+    const form = formidable({
+      maxFileSize: 5 * 1024 * 1024
+    })
 
-    const jobDesc = Array.isArray(fields.jobDesc) ? fields.jobDesc[0] : fields.jobDesc
-    const file = Array.isArray(files.resume) ? files.resume[0] : files.resume
+    // 🔥 FIX: parse pakai callback biar stabil di serverless
+    const { fields, files } = await new Promise((resolve, reject) => {
+      form.parse(req, (err, fields, files) => {
+        if (err) return reject(err)
+        resolve({ fields, files })
+      })
+    })
+
+    const jobDesc = Array.isArray(fields.jobDesc)
+      ? fields.jobDesc[0]
+      : fields.jobDesc
+
+    const file = Array.isArray(files.resume)
+      ? files.resume[0]
+      : files.resume
 
     if (!file || !jobDesc) {
-      return res.status(400).json({ error: 'Resume and job description required.' })
+      return res.status(400).json({
+        error: 'Resume and job description required.'
+      })
     }
 
     let resumeText = ''
 
-    if (file.mimetype === 'application/pdf' || file.originalFilename?.endsWith('.pdf')) {
+    if (
+      file.mimetype === 'application/pdf' ||
+      file.originalFilename?.endsWith('.pdf')
+    ) {
       const pdfParse = require('pdf-parse')
-      resumeText = (await pdfParse(fs.readFileSync(file.filepath))).text
+      const buffer = fs.readFileSync(file.filepath)
+      const parsed = await pdfParse(buffer)
+      resumeText = parsed.text
     } else {
       resumeText = fs.readFileSync(file.filepath, 'utf8')
     }
 
     if (!resumeText || resumeText.trim().length < 50) {
-      return res.status(400).json({ error: 'Could not extract text.' })
+      return res.status(400).json({
+        error: 'Could not extract text.'
+      })
     }
 
     const beforeATS = calculateATSScore(resumeText, jobDesc)
@@ -45,9 +77,10 @@ module.exports = async function handler(req, res) {
     const completion = await client.chat.completions.create({
       model: 'gpt-4o-mini',
       max_tokens: 2000,
-      messages: [{
-        role: 'user',
-        content: `Rewrite this resume for ATS optimization.
+      messages: [
+        {
+          role: 'user',
+          content: `Rewrite this resume for ATS optimization.
 
 Include keywords: ${beforeATS.missingKeywords.join(', ')}
 
@@ -58,12 +91,17 @@ ${jobDesc.slice(0, 2000)}
 ${resumeText.slice(0, 2000)}
 
 Return ONLY the resume.`
-      }]
+        }
+      ]
     })
 
-    const rewrittenResume = completion.choices[0].message.content || ''
+    const rewrittenResume =
+      completion?.choices?.[0]?.message?.content || ''
 
-    const afterATS = calculateATSScore(rewrittenResume, jobDesc)
+    const afterATS = calculateATSScore(
+      rewrittenResume,
+      jobDesc
+    )
 
     return res.status(200).json({
       success: true,
@@ -72,9 +110,12 @@ Return ONLY the resume.`
       rewrittenResume,
       originalResume: resumeText
     })
-
   } catch (err) {
-    console.error(err)
-    return res.status(500).json({ error: 'Something went wrong' })
+    console.error('ANALYZE ERROR:', err)
+
+    return res.status(500).json({
+      error: 'Something went wrong',
+      detail: err.message // 🔥 bantu debug di production
+    })
   }
 }
