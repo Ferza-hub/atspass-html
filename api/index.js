@@ -161,3 +161,10 @@ module.exports.sendEmail = async (req, res) => {
     res.status(500).json({ error: 'Failed to send email.' })
   }
 }
+
+module.exports = async (req, res) => {
+  const url = req.url.split('?')[0]
+  if (url === '/api/analyze')    return module.exports.analyze(req, res)
+  if (url === '/api/send-email') return module.exports.sendEmail(req, res)
+  res.status(404).json({ error: 'Not found' })
+}
