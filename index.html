@@ -280,7 +280,7 @@
 
 <nav>
   <a href="#" class="logo" onclick="showSection('landing')">ATSPass</a>
-  <span class="nav-pill">$5 · 10 applications · no subscription</span>
+  <span class="nav-pill">Free access · Full resume optimization</span>
 </nav>
 
 <!-- ══ LANDING ══ -->
@@ -288,13 +288,13 @@
   <div id="landing">
     <div class="hero">
       <div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:28px">
-      <div class="hero-badge"><span></span> $5 for 10 job applications · No subscription ever</div>
+      <div class="hero-badge"><span></span> Free resume analysis and optimization</div>
       <a href="https://www.producthunt.com/products/atspass-optimize-your-resume-for-any-job?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-atspass-optimize-your-resume-for-any-job" target="_blank" rel="noopener noreferrer"><img alt="ATSPass Optimize your resume for any job - Upload your CV. Get ATS score. Fix it instantly. | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1106264&amp;theme=light&amp;t=1774373824746"></a>
       </div>  
       <h1>Your resume, optimized<br>for <em>every job you apply to</em></h1>
       <p>Upload your resume. Paste any job description. Get an ATS score and AI-rewritten resume in 30 seconds.</p>
       <button class="btn-primary" onclick="showSection('tool')">Try free — see your score first</button>
-      <p class="hero-note">See your ATS score and full rewrite before paying anything.</p>
+      <p class="hero-note">See your ATS score and full rewrite for free.</p>
     </div>
 
     <div class="mockup">
@@ -334,38 +334,14 @@
         <div><div class="step-num">01</div><div class="step-title">Upload your resume</div><div class="step-desc">PDF or Word. We parse it instantly.</div></div>
         <div><div class="step-num">02</div><div class="step-title">Paste job description</div><div class="step-desc">Copy from LinkedIn, Indeed, anywhere.</div></div>
         <div><div class="step-num">03</div><div class="step-title">See your ATS score</div><div class="step-desc">Before/after score and full rewrite — free preview.</div></div>
-        <div><div class="step-num">04</div><div class="step-title">Pay $5, get it via email</div><div class="step-desc">10 applications. No subscription ever.</div></div>
+        <div><div class="step-num">04</div><div class="step-title">Get your resume by email</div><div class="step-desc">No payment required. Full access is free.</div></div>
       </div>
     </div>
   </div>
 
   <div class="pricing">
-    <h2>Simple pricing</h2>
-    <p>Pay once, no subscription, no surprise charges.</p>
-    <div class="tier-grid">
-      <div class="tier">
-        <div class="tier-name">Starter</div>
-        <div class="tier-price">$5</div>
-        <div class="tier-cycle">one-time</div>
-        <div class="tier-apps">10 applications</div>
-        <div class="tier-apps-note">Perfect to start</div>
-      </div>
-      <div class="tier featured">
-        <div class="tier-pop">Most popular</div>
-        <div class="tier-name">Pro Pack</div>
-        <div class="tier-price">$12</div>
-        <div class="tier-cycle">one-time</div>
-        <div class="tier-apps">30 applications</div>
-        <div class="tier-apps-note">Best value</div>
-      </div>
-      <div class="tier">
-        <div class="tier-name">Hustler</div>
-        <div class="tier-price">$25</div>
-        <div class="tier-cycle">one-time</div>
-        <div class="tier-apps">Unlimited · 1 year</div>
-        <div class="tier-apps-note">Serious job seekers</div>
-      </div>
-    </div>
+    <h2>Full access is free</h2>
+    <p>Analyze your resume, see the ATS score, and receive the optimized version without any payment.</p>
     <button class="btn-primary" onclick="showSection('tool')">Try it free — see your score first</button>
   </div>
 
@@ -403,7 +379,7 @@
 
   <div class="tool-cta">
     <button class="btn-primary" onclick="handleAnalyze()">Analyze my resume →</button>
-    <p class="cta-note">Free to analyze · Pay only to download the optimized version</p>
+    <p class="cta-note">Free to analyze and receive your optimized resume</p>
   </div>
 </section>
 
@@ -467,25 +443,13 @@
       </div>
       <div class="preview-body">
         <pre class="preview-text" id="opt-text"></pre>
-        <div class="preview-blur">
-          <p>Full resume ready</p>
-          <span>Pay $5 to unlock · Delivered to your email</span>
-        </div>
       </div>
     </div>
   </div>
 
-  <div class="pay-box">
-    <div class="pay-price">$5 · 10 applications</div>
-    <div class="pay-sub">No subscription. Pay once, use for 10 job applications.</div>
-    <a id="paypal-btn" href="#" target="_blank" class="btn-paypal" onclick="showEmailSection()">Pay $5 via PayPal →</a>
-    <p class="pay-note">After payment, enter your email below to receive your resume.</p>
-    <button class="btn-already" onclick="showEmailSection()">I already paid — send my resume</button>
-  </div>
-
   <div id="email-section">
-    <h3>Enter your email</h3>
-    <p>We'll send your optimized resume immediately after you complete payment.</p>
+    <h3>Get your optimized resume</h3>
+    <p>Enter your email and we'll send your optimized resume for free.</p>
     <div class="email-input-wrap">
       <input type="email" id="email-input" placeholder="you@example.com" />
       <button onclick="handleSendEmail()">Send →</button>
@@ -507,7 +471,6 @@
 
 <script>
   // ── CONFIG — change these ──
-  const PAYPAL_LINK = 'https://www.paypal.com/paypalme/zenithintelligence'
   const API_BASE    = '' // your deployed backend URL
 
   // ── State ──
@@ -641,8 +604,7 @@ document.getElementById('orig-text').textContent =
 
 document.getElementById('opt-text').textContent =
   smartTrim(optimized, 500)
-    // PayPal link
-    document.getElementById('paypal-btn').href = PAYPAL_LINK
+    showEmailSection()
   }
 
   function scoreClass(score) {

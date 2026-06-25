@@ -133,7 +133,7 @@ async function sendEmail(req, res) {
       await transporter.sendMail({
         from:    `ATSPass <${process.env.EMAIL_FROM}>`,
         to:      process.env.ADMIN_EMAIL,
-        subject: `💰 New ATSPass payment — ${email}`,
+        subject: `� New ATSPass request — ${email}`,
         text:    `Customer: ${email}\nTime: ${new Date().toISOString()}`
       })
     }
